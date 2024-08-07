@@ -12,4 +12,13 @@ const register: Joi.ObjectSchema = Joi.object().keys({
   password: Joi.string().required().custom(password),
 });
 
-export { register };
+/**
+ * Validation schema for user logging
+ * @type {Joi.ObjectSchema}
+ */
+const login: Joi.ObjectSchema = Joi.object().keys({
+  username: Joi.string().required(),
+  password: Joi.string().required(),
+});
+
+export { register, login };

@@ -17,6 +17,7 @@ interface UserDocument extends Document {
   password: string;
   _id: string;
   hashPassword(password: string): Promise<string>;
+  comparePassword(password: string): Promise<boolean>;
 }
 
 /**
@@ -60,6 +61,20 @@ userSchema.methods.hashPassword = async function (
   const salt: string = await bcrypt.genSalt(10);
   const hashedPassword: string = await bcrypt.hash(password, salt);
   return hashedPassword;
+};
+
+/**
+ * Method to compare user's hashed password.
+ * @method comparePassword
+ * @memberof UserDocument
+ * @param {string} password - The password to compare.
+ * @returns {Promise<boolean>} A promise that resolves with the comparison result.
+ */
+userSchema.methods.comparePassword = async function (
+  password: string
+): Promise<boolean> {
+  const user = this;
+  return await bcrypt.compare(password, user.password);
 };
 
 /**
