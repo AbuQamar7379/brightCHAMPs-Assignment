@@ -1,5 +1,6 @@
 import express, { Application } from "express";
 import cors from "cors";
+
 import userAuthSystemRouter from "./router";
 
 const app: Application = express();
