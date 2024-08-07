@@ -21,4 +21,13 @@ const login: Joi.ObjectSchema = Joi.object().keys({
   password: Joi.string().required(),
 });
 
-export { register, login };
+/**
+ * Validation schema for resetting password
+ * @type {Joi.ObjectSchema}
+ */
+const resetPassword: Joi.ObjectSchema = Joi.object().keys({
+  username: Joi.string().required(),
+  newPassword: Joi.string().required(),
+});
+
+export { register, login, resetPassword };

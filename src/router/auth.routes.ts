@@ -39,4 +39,19 @@ router.post(
   (req: Request, res: Response) => authController.login(req, res)
 );
 
+/**
+ * Route handler for password reset.
+ * @route PATCH /reset-password
+ * @param {Request} req - The Express request object. This object contains the user's password reset details in the request body.
+ * @param {Response} res - The Express response object. This object is used to send the HTTP response back to the client.
+ * @middleware {validate.body} - Middleware function to validate the request body against the password reset schema.
+ * @middleware {authValidation.resetPassword} - Joi validation schema for password reset.
+ * @returns {void} - Sends a response with the status of the password reset process.
+ */
+router.patch(
+  "/reset-password",
+  validate.body(authValidation.resetPassword),
+  (req: Request, res: Response) => authController.resetPassword(req, res)
+);
+
 export default router;

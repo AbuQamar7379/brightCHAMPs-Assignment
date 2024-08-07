@@ -3,6 +3,7 @@ import httpStatus from "http-status";
 import { ApiError } from "../utils/ApiError";
 import { User } from "../models";
 import { UserDocument } from "../models/user.model";
+import { config } from "../config/config";
 
 /**
  * Interface for user authentication properties required during registration.
@@ -111,6 +112,57 @@ const loginUser = async ({
 };
 
 /**
+ * Resets a user's password after validating the reset key.
+ * This function updates the user's password if the provided reset key is valid.
+ * @param {string} username - The username of the user whose password is being reset.
+ * @param {string} newPassword - The new password that the user wants to set.
+ * @param {string | string[] | undefined} resetKey - The key used to verify the password reset request.
+ * @returns {Promise<UserDocument>} - Returns the updated user document if the password reset is successful.
+ * @throws {ApiError} - Throws an error if:
+ * - The reset key is invalid (`Can't reset password resetKey is invalid!`).
+ * - The user does not exist (`User doesn't exist, try registering first or username is incorrect`).
+ */
+const resetUserPass = async (
+  username: string,
+  newPassword: string,
+  resetKey: string | string[] | undefined
+): Promise<UserDocument> => {
+  try {
+    if (resetKey !== process.env.PASSWORD_RESET_KEY) {
+      throw new ApiError(
+        "Can't reset password resetKey is invalid!",
+        httpStatus.BAD_REQUEST
+      );
+    }
+
+    let user = await User.Model.findOneAndUpdate(
+      { username },
+      { password: newPassword },
+      { new: true }
+    );
+
+    if (!user) {
+      throw new ApiError(
+        `User doesn't exist, try registering first or username is incorrect`,
+        httpStatus.BAD_REQUEST
+      );
+    }
+
+    // hash the new password
+    user.password = await user.hashPassword(user.password);
+
+    await saveDocument(user);
+
+    return user;
+  } catch (err: any) {
+    throw new ApiError(
+      `Error: ${err.message}`,
+      err.statusCode || httpStatus.INTERNAL_SERVER_ERROR
+    );
+  }
+};
+
+/**
  * Finds a user by their username.
  *
  * @param {string} username - The username of the user to be found.
@@ -129,4 +181,4 @@ const findUserByUsername = async (
 const saveDocument = async (doc: UserDocument): Promise<UserDocument> =>
   await doc.save();
 
-export { registerUser, loginUser };
+export { registerUser, loginUser, resetUserPass };

@@ -1,4 +1,4 @@
-import { register, login } from "./auth.validation";
+import { register, login, resetPassword } from "./auth.validation";
 
 // Export an object with multiple authentication validation methods
-export const authValidation = { register, login };
+export const authValidation = { register, login, resetPassword };
